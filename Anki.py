@@ -5,6 +5,9 @@ import csv
 import codecs
 import re
 import requests
+import urllib
+from urllib.request import Request, urlopen
+from fake_useragent import UserAgent
 from bs4 import BeautifulSoup as BS
 
 # To do: write a separate file for the words that failed
@@ -26,39 +29,61 @@ for i in range(len(lines)):
 # Now remove any duplicates
 words = list(set(words))
 
-noRequests = 0
-
 sentences = []
 translations = []
+failed = []
+
+
+## Get a random proxy (taken from https://codelike.pro/create-a-crawler-with-rotating-ip-proxy-in-python/)
+
+ua = UserAgent() # From here we generate a random user agent
+proxies = [] # Will contain proxies [ip, port]
+
+def random_proxy():
+  return random.randint(0, len(proxies) - 1)
+
+# Retrieve latest proxies
+proxies_req = Request('https://www.sslproxies.org/')
+proxies_req.add_header('User-Agent', ua.random)
+proxies_doc = urlopen(proxies_req).read().decode('utf8')
+
+soup = BS(proxies_doc, 'html.parser')
+proxies_table = soup.find(id='proxylisttable')
+
+# Save proxies in the array
+for row in proxies_table.tbody.find_all('tr'):
+  proxies.append({
+    'ip':   row.find_all('td')[0].string,
+    'port': row.find_all('td')[1].string
+  })
+
+# Choose a random proxy
+proxy_index = random_proxy()
+proxy = proxies[proxy_index]
+
+
 
 for i in range(len(words)):
-
+    print(i)
     word = words[i]
 
-    page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word)
 
 
-    noRequests += 1
+    # req = Request("https://www.linguee.com/english-german/search?source=auto&query=" + word)
+    # req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'http')
+    # soup = BS(urlopen(req).read(), "html.parser")
+
+    proxies = {
+        "http" : "http://" + proxy["ip"] + ":" + proxy["port"],
+        "https" : "http://" + proxy["ip"] + ":" + proxy["port"],
+    }
+
+    page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word, proxies=proxies)
+    print(proxy["ip"])
     soup = BS(page.text, "html.parser")
 
-    isBlocked = soup.find(text="You have sent too many requests causing Linguee to block your computer")
-    if isBlocked:
-        print("Blocked for sending too many requests after " + str(noRequests) + " requests :(")
-
-        # Write what we have so far to the file
-        assert len(sentences) == len(translations)
-
-        print(sentences)
-        print(translations)
-
-        with open("sentences.csv", "wb") as csvfile:
-            writer = csv.writer(csvfile, delimiter=";")
-            for i in range(len(sentences)):
-                writer.writerow([sentences[i], translations[i]])
-        break
 
     lines = soup.find_all(class_="tag_e")
-
 
     # Get all examples
 
@@ -86,11 +111,16 @@ for i in range(len(words)):
     except IndexError:
         print("Word failed:", word)
         print("\n")
+        failed.append(word)
 
-    time.sleep(random.randrange(10, 20))
+    # time.sleep(0.5)
 
 
 assert len(sentences) == len(translations)
+
+print(sentences)
+print(translations)
+print(failed)
 
 with open("sentences.csv", "wb") as csvfile:
     writer = csv.writer(csvfile, delimiter=";")
