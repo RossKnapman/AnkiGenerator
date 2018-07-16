@@ -73,12 +73,12 @@ for i in range(len(words)):
     # req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'http')
     # soup = BS(urlopen(req).read(), "html.parser")
 
-    proxies = {
+    proxiesDict = {
         "http" : "http://" + proxy["ip"] + ":" + proxy["port"],
         "https" : "http://" + proxy["ip"] + ":" + proxy["port"],
     }
 
-    page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word, proxies=proxies)
+    page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word, proxies=proxiesDict)
     print(proxy["ip"])
     soup = BS(page.text, "html.parser")
 
@@ -114,6 +114,11 @@ for i in range(len(words)):
         failed.append(word)
 
     # time.sleep(0.5)
+
+    # Generate new proxy every 10 requests
+    if i % 10 == 0:
+        proxy_index = random_proxy()
+        proxy = proxies[proxy_index]
 
 
 assert len(sentences) == len(translations)
