@@ -149,7 +149,7 @@ print(sentences)
 print(translations)
 print(failed)
 
-with open("sentences.csv", "wb") as csvfile:
+with open("sentences.csv", "w") as csvfile:
     writer = csv.writer(csvfile, delimiter=";")
     for i in range(len(sentences)):
         writer.writerow([sentences[i], translations[i]])
