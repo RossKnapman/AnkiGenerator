@@ -6,6 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import time
 
 englishWords = []
@@ -30,71 +31,72 @@ for i in range(len(lines)):
 # Now remove any duplicates
 words = list(set(words))
 
-test = 'Schloss'
+# word = 'schieben'
 
-driver = webdriver.Chrome(ChromeDriverManager().install())
-driver.get('https://www.deepl.com/translator#' + inputLanguage + '/' + targetLanguage + '/' + test)
+for word in words:
 
-# WebDriverWait(driver, 30).until(
-#     EC.presence_of_element_located((By.XPATH, "//div[@dl-test='translator-source']"))
-# )
-# inputLanguage = driver.find_element_by_xpath("//div[@dl-test='translator-source']")
-# dropDownButton = driver.find_element_by_xpath("//button[@dl-test='translator-source-lang-btn']")
-# dropDownButton.click()
-# # WebDriverWait(driver, 30).until(
-# #     EC.element_to_be_clickable((By.XPATH, "//button[@dl-value='FR']"))
-# # )
-# driver.implicitly_wait(2)
-# inputButton = inputLanguage.find_element_by_xpath("//button[@dl-value='FR']")
-# print(inputButton.text)
-# inputButton.click()
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.get('https://www.deepl.com/translator#' + inputLanguage + '/' + targetLanguage + '/' + word)
 
-# input = driver.find_element_by_tag_name('textarea')
-# input.send_keys(test)
 
-WebDriverWait(driver, 30).until(
-    EC.presence_of_element_located((By.CLASS_NAME, "tag_wordtype"))
-)
+    try:
+        WebDriverWait(driver, 2).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "tag_wordtype"))
+        )
+    except TimeoutException:  # Word unavailable
+        print('Failed to find word:', word)
 
-pageHTML = driver.page_source
-soup = BS(pageHTML, 'html.parser')
+    pageHTML = driver.page_source
+    soup = BS(pageHTML, 'html.parser')
 
-featured = driver.find_elements_by_xpath('//div[@class="lemma featured"]')
+    featured = soup.findAll("div", {"class": "lemma featured"})
+    print(len(featured))
 
-word = featured[1]
+    # word = featured[0]
 
-# for word in featured:
+    for featuredWord in featured:
 
-lemmaTag = word.find_element_by_class_name('tag_lemma')
-foreignWord = lemmaTag.find_element_by_class_name('dictLink').text
-print(foreignWord)
+        foreignWord = featuredWord.find("span", {"class": "tag_lemma"}).find("a")
+        try:
+            foreignWord.span.decompose()
+        except AttributeError:  # There is no text in a "span" tag to remove
+            pass
+        foreignWord = foreignWord.text
 
-translationTag = word.find_element_by_class_name('tag_trans')
+        englishWord = featuredWord.find("a", {"class": "dictLink featured"})
+        try:
+            englishWord.span.decompose()
+        except AttributeError:  # There is no text in a "span" tag to remove
+            pass
+        englishWord = englishWord.text
 
-englishWord = translationTag.find_element_by_xpath('//a[@class="dictLink featured"]').text
-print("Translation tag:", translationTag.get_attribute('innerHTML'))
-print("English:", englishWord)
+        type = featuredWord.find("span", {"class": "tag_wordtype"}).text
 
-type = word.find_element_by_class_name('tag_wordtype').text
+        if 'noun' in type:
+            gender = type.split(',')[1]
+            print(gender)
 
-if 'noun' in type:
-    englishWords.append('the ' + englishWord)
-    gender = type.split(', ')[1]
+            if 'masculine' in gender:
+                englishWords.append('the ' + englishWord)
+                foreignWords.append('der ' + foreignWord)
 
-    if gender == 'masculine':
-        foreignWords.append('der ' + foreignWord)
+            elif 'feminine' in gender:
+                englishWords.append('the ' + englishWord)
+                foreignWords.append('die ' + foreignWord)
 
-    elif gender == 'feminine':
-        foreignWords.append('die ' + foreignWord)
+            elif 'neuter' in gender:
+                englishWords.append('the ' + englishWord)
+                foreignWords.append('das ' + foreignWord)
 
-    elif gender == 'neuter':
-        foreignWords.append('das ' + foreignWord)
+            else:  # E.g. plural
+                pass
 
-else:
-    englishWords.append(englishWord)
-    foreignWords.append(foreignWord)
+        else:
+            englishWords.append(englishWord)
+            foreignWords.append(foreignWord)
 
-print(englishWords, foreignWords)
+    print(englishWords, foreignWords)
+
+    driver.close()
+
 assert(len(englishWords) == len(foreignWords))
-
-driver.close()
