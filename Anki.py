@@ -10,8 +10,6 @@ from urllib.request import Request, urlopen
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup as BS
 
-# To do: write a separate file for the words that failed
-
 words = []
 
 f = codecs.open("My Clippings.txt", 'r', 'utf-8')
@@ -23,8 +21,6 @@ for i in range(len(lines)):
 #        word = re.sub(r'[^a-zA-Z]', "", lines[i-1])
         word = lines[i-1]
         words.append(word)
-
-#print(words)
 
 # Now remove any duplicates
 words = list(set(words))
@@ -60,8 +56,6 @@ def retrieveProxies():
 
     return proxies
 
-print(len(proxies))
-
 # Choose a random proxy
 proxies = retrieveProxies()
 proxy_index = random_proxy()
@@ -70,14 +64,7 @@ proxy = proxies[proxy_index]
 
 
 for i in range(len(words)):
-    print(i)
     word = words[i]
-
-
-
-    # req = Request("https://www.linguee.com/english-german/search?source=auto&query=" + word)
-    # req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'http')
-    # soup = BS(urlopen(req).read(), "html.parser")
 
     page = None
 
@@ -90,7 +77,6 @@ for i in range(len(words)):
 
         try:
 
-            print("Proxy:", proxy["ip"])
             page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word, proxies=proxiesDict)
 
         except:
@@ -98,7 +84,6 @@ for i in range(len(words)):
             print("Lost connection, changing proxy...")
             proxy_index = random_proxy()
             proxy = proxies[proxy_index]
-            print("New proxy:", proxy["ip"])
 
 
     print("Creating soup...")
