@@ -10,9 +10,6 @@ from selenium.common.exceptions import TimeoutException
 import time
 import csv
 
-englishWords = []
-foreignWords = []
-
 ## To do
 # Integrate into existing program, as a function that can be called
 # Write a French version
@@ -47,6 +44,9 @@ for word in words:
     if word != '':
 
         try:
+
+            csvfile = open('words.csv', 'a+')
+            writer = csv.writer(csvfile, delimiter=";")
 
             driver = webdriver.Chrome(chrome_options=options)
             driver.get('https://www.deepl.com/translator')
@@ -93,23 +93,34 @@ for word in words:
                     gender = type.split(',')[1]
 
                     if 'masculine' in gender:
-                        englishWords.append('the ' + englishWord)
-                        foreignWords.append('der ' + foreignWord)
+                        # englishWords.append('the ' + englishWord)
+                        # foreignWords.append('der ' + foreignWord)
+                        writer.writerow(['the ' + englishWord, 'der ' + foreignWord])
+                        writer.writerow(['der ' + foreignWord, 'the ' + englishWord])
 
                     elif 'feminine' in gender:
-                        englishWords.append('the ' + englishWord)
-                        foreignWords.append('die ' + foreignWord)
+                        # englishWords.append('the ' + englishWord)
+                        # foreignWords.append('die ' + foreignWord)
+                        writer.writerow(['the ' + englishWord, 'die ' + foreignWord])
+                        writer.writerow(['die ' + foreignWord, 'the ' + englishWord])
+
 
                     elif 'neuter' in gender:
-                        englishWords.append('the ' + englishWord)
-                        foreignWords.append('das ' + foreignWord)
+                        # englishWords.append('the ' + englishWord)
+                        # foreignWords.append('das ' + foreignWord)
+                        writer.writerow(['the ' + englishWord, 'das ' + foreignWord])
+                        writer.writerow(['das ' + foreignWord, 'the ' + englishWord])
+
 
                     else:  # E.g. plural
                         pass
 
                 else:
-                    englishWords.append(englishWord)
-                    foreignWords.append(foreignWord)
+                    # englishWords.append(englishWord)
+                    # foreignWords.append(foreignWord)
+                    writer.writerow([englishWord, foreignWord])
+                    writer.writerow([foreignWord, englishWord])
+
 
             # print(englishWords, foreignWords)
 
@@ -120,10 +131,10 @@ for word in words:
             print(word)
             continue
 
-assert(len(englishWords) == len(foreignWords))
+# assert(len(englishWords) == len(foreignWords))
 
-with open("words.csv", "w") as csvfile:
-    writer = csv.writer(csvfile, delimiter=";")
-    for i in range(len(englishWords)):
-        writer.writerow([englishWords[i], foreignWords[i]])
-        writer.writerow([foreignWords[i], englishWords[i]])
+# with open("words.csv", "w") as csvfile:
+#     writer = csv.writer(csvfile, delimiter=";")
+#     for i in range(len(englishWords)):
+#         writer.writerow([englishWords[i], foreignWords[i]])
+#         writer.writerow([foreignWords[i], englishWords[i]])
