@@ -12,6 +12,9 @@ from bs4 import BeautifulSoup as BS
 
 words = []
 
+# language = 'german'
+language = 'french'
+
 f = codecs.open("My Clippings.txt", 'r', 'utf-8')
 
 lines = f.read().splitlines()
@@ -77,7 +80,7 @@ for i in range(len(words)):
 
         try:
 
-            page = requests.get("https://www.linguee.com/english-german/search?source=auto&query=" + word, proxies=proxiesDict)
+            page = requests.get("https://www.linguee.com/english-" + language + "/search?source=auto&query=" + word, proxies=proxiesDict)
 
         except:
             proxies = retrieveProxies()
