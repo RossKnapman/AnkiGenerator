@@ -93,16 +93,24 @@ for word in words:
                     gender = type.split(',')[1]
 
                     if 'masculine' in gender:
-                        # englishWords.append('the ' + englishWord)
-                        # foreignWords.append('der ' + foreignWord)
-                        writer.writerow(['the ' + englishWord, 'le ' + foreignWord])
-                        writer.writerow(['le ' + foreignWord, 'the ' + englishWord])
+
+                        if foreignWord[0] in 'bcdfghjklmnpqrstvwxyz':
+                            writer.writerow(['the ' + englishWord, 'le ' + foreignWord])
+                            writer.writerow(['le ' + foreignWord, 'the ' + englishWord])
+
+                        else:
+                            writer.writerow(['the ' + englishWord, 'l\'' + foreignWord + ' (m)'])
+                            writer.writerow(['l\'' + foreignWord + ' (m)', 'the ' + englishWord])
 
                     elif 'feminine' in gender:
-                        # englishWords.append('the ' + englishWord)
-                        # foreignWords.append('die ' + foreignWord)
-                        writer.writerow(['the ' + englishWord, 'la ' + foreignWord])
-                        writer.writerow(['la ' + foreignWord, 'the ' + englishWord])
+
+                        if foreignWord[0] in 'bcdfghjklmnpqrstvwxyz':
+                            writer.writerow(['the ' + englishWord, 'la ' + foreignWord])
+                            writer.writerow(['la ' + foreignWord, 'the ' + englishWord])
+
+                        else:
+                            writer.writerow(['the ' + englishWord, 'l\'' + foreignWord + ' (f)'])
+                            writer.writerow(['l\'' + foreignWord + ' (f)', 'the ' + englishWord])
 
                     else:  # E.g. plural
                         pass
