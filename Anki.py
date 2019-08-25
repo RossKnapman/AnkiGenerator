@@ -10,6 +10,8 @@ from urllib.request import Request, urlopen
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup as BS
 
+### Write to file as going, not at the end!
+
 words = []
 
 # language = 'german'
@@ -28,9 +30,9 @@ for i in range(len(lines)):
 # Now remove any duplicates
 words = list(set(words))
 
-sentences = []
-translations = []
-failed = []
+# sentences = []
+# translations = []
+# failed = []
 
 
 ## Get a random proxy (taken from https://codelike.pro/create-a-crawler-with-rotating-ip-proxy-in-python/)
@@ -114,14 +116,18 @@ for i in range(len(words)):
         print(translation)
         print("\n")
 
-        sentences.append(sentence)
-        translations.append(translation)
+        csvfile = open('phrases.csv', 'a+')
+        writer = csv.writer(csvfile, delimiter=";")
+        writer.writerow([sentence, translation])
+
+        # sentences.append(sentence)
+        # translations.append(translation)
 
 
     except IndexError:
         print("Word failed:", word)
         print("\n")
-        failed.append(word)
+        # failed.append(word)
 
     # time.sleep(0.5)
 
@@ -131,13 +137,13 @@ for i in range(len(words)):
         proxy = proxies[proxy_index]
 
 
-assert len(sentences) == len(translations)
-
-print(sentences)
-print(translations)
-print(failed)
-
-with open("sentences.csv", "w") as csvfile:
-    writer = csv.writer(csvfile, delimiter=";")
-    for i in range(len(sentences)):
-        writer.writerow([sentences[i], translations[i]])
+# assert len(sentences) == len(translations)
+#
+# print(sentences)
+# print(translations)
+# print(failed)
+#
+# with open("sentences.csv", "w") as csvfile:
+#     writer = csv.writer(csvfile, delimiter=";")
+#     for i in range(len(sentences)):
+#         writer.writerow([sentences[i], translations[i]])
