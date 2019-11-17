@@ -9,10 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import time
 import csv
-
-## To do
-# Integrate into existing program, as a function that can be called
-# Write a French version
+import sys
 
 
 language = 'DE'
@@ -24,20 +21,25 @@ options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')
 
-f = codecs.open("My Clippings.txt", 'r', 'utf-8')
-
+# For my simple list
+f = codecs.open('cut.txt', 'r', 'utf-8')
 lines = f.read().splitlines()
 
 for i in range(len(lines)):
-    if lines[i] == "==========":
-#        word = re.sub(r'[^a-zA-Z]', "", lines[i-1])
-        word = lines[i-1]
-        words.append(word)
+    words.append(lines[i])
 
-# Now remove any duplicates
-words = list(set(words))
-
-# word = 'schieben'
+# f = codecs.open("My Clippings.txt", 'r', 'utf-8')
+#
+# lines = f.read().splitlines()
+#
+# for i in range(len(lines)):
+#     if lines[i] == "==========":
+# #        word = re.sub(r'[^a-zA-Z]', "", lines[i-1])
+#         word = lines[i-1]
+#         words.append(word)
+#
+# # Now remove any duplicates
+# words = list(set(words))
 
 for word in words:
 
@@ -48,7 +50,7 @@ for word in words:
             csvfile = open('words.csv', 'a+')
             writer = csv.writer(csvfile, delimiter=";")
 
-            driver = webdriver.Chrome(chrome_options=options)
+            driver = webdriver.Chrome(options=options)
             driver.get('https://www.deepl.com/translator')
             driver.find_element_by_tag_name('textarea').send_keys(word)
 
@@ -63,6 +65,9 @@ for word in words:
                 )
             except TimeoutException:  # Word unavailable
                 print('Failed to find word:', word)
+                failedCSV = open('failed.csv', 'a+')
+                failedWriter = csv.writer(failedCSV)
+                failedWriter.writerow([word])
 
             pageHTML = driver.page_source
             soup = BS(pageHTML, 'html.parser')
