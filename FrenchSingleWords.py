@@ -10,12 +10,9 @@ from selenium.common.exceptions import TimeoutException
 import time
 import csv
 
-## To do
-# Integrate into existing program, as a function that can be called
-# Write a French version
-
 
 language = 'FR'
+# outLanguage = 'ES'
 
 words = []
 
@@ -37,8 +34,6 @@ for i in range(len(lines)):
 # Now remove any duplicates
 words = list(set(words))
 
-# word = 'schieben'
-
 for word in words:
 
     if word != '':
@@ -50,12 +45,30 @@ for word in words:
 
             driver = webdriver.Chrome(chrome_options=options)
             driver.get('https://www.deepl.com/translator')
+
             driver.find_element_by_tag_name('textarea').send_keys(word)
 
+            try:
+                WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "lmt__language_container"))
+                )
+            except:
+                print('Page failed to load:')
+#
             driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
-            testIn = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-value="' + language + '"]')
+            inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-value="' + language + '"]')
+            inLangButton.click()
 
-            testIn.click()
+            # driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').click()
+            # #outLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').find_element_by_xpath('//button[@dl-value="' + outLanguage + '"]')
+            # print("trying to click target language")
+            # outLangButton = driver.find_element_by_xpath('//button[@dl-value="ES"]')
+            # outLangButton.click()
+
+            # print('\n\n\nTrying to find translate_from\n\n\n')
+            #
+            # translateFrom = driver.find_element_by_class_name("translate_from")
+            # print(translateFrom.find_element_by_id('strong').text)
 
             try:
                 WebDriverWait(driver, 10).until(
