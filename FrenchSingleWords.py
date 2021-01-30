@@ -11,11 +11,12 @@ import time
 import csv
 
 
-language = 'FR'
+language = 'fr'
 # outLanguage = 'ES'
 
 words = []
 
+# Need to have chromedriver installed
 options = webdriver.ChromeOptions()
 options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
 options.add_argument('--headless')
@@ -56,7 +57,7 @@ for word in words:
                 print('Page failed to load:')
 #
             driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
-            inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-value="' + language + '"]')
+            inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-' + language + '"]')
             inLangButton.click()
 
             # driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').click()
@@ -111,6 +112,7 @@ for word in words:
                             writer.writerow(['the ' + englishWord, 'le ' + foreignWord])
                             writer.writerow(['le ' + foreignWord, 'the ' + englishWord])
 
+                        # If begins with vowel, start with l' instead of le/la
                         else:
                             writer.writerow(['the ' + englishWord, 'l\'' + foreignWord + ' (m)'])
                             writer.writerow(['l\'' + foreignWord + ' (m)', 'the ' + englishWord])

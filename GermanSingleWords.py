@@ -12,17 +12,18 @@ import csv
 import sys
 
 
-language = 'DE'
+language = 'de'
 
 words = []
 
+# Need to have chromedriver installed
 options = webdriver.ChromeOptions()
 options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
 options.add_argument('--headless')
 options.add_argument('--disable-gpu')
 
 # For my simple list
-f = codecs.open('cut.txt', 'r', 'utf-8')
+f = codecs.open('My Clippings.txt', 'r', 'utf-8')
 lines = f.read().splitlines()
 
 for i in range(len(lines)):
@@ -55,9 +56,9 @@ for word in words:
             driver.find_element_by_tag_name('textarea').send_keys(word)
 
             driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
-            testIn = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-value="' + language + '"]')
+            inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-' + language + '"]')
 
-            testIn.click()
+            inLangButton.click()
 
             try:
                 WebDriverWait(driver, 10).until(
