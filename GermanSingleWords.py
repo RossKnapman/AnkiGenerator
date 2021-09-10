@@ -29,19 +29,6 @@ lines = f.read().splitlines()
 for i in range(len(lines)):
     words.append(lines[i])
 
-# f = codecs.open("My Clippings.txt", 'r', 'utf-8')
-#
-# lines = f.read().splitlines()
-#
-# for i in range(len(lines)):
-#     if lines[i] == "==========":
-# #        word = re.sub(r'[^a-zA-Z]', "", lines[i-1])
-#         word = lines[i-1]
-#         words.append(word)
-#
-# # Now remove any duplicates
-# words = list(set(words))
-
 for word in words:
 
     if word != '':

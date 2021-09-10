@@ -135,15 +135,3 @@ for i in range(len(words)):
     if i % 10 == 0:
         proxy_index = random_proxy()
         proxy = proxies[proxy_index]
-
-
-# assert len(sentences) == len(translations)
-#
-# print(sentences)
-# print(translations)
-# print(failed)
-#
-# with open("sentences.csv", "w") as csvfile:
-#     writer = csv.writer(csvfile, delimiter=";")
-#     for i in range(len(sentences)):
-#         writer.writerow([sentences[i], translations[i]])

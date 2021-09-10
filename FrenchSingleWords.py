@@ -2,7 +2,6 @@
 import codecs
 from bs4 import BeautifulSoup as BS
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -12,15 +11,11 @@ import csv
 
 
 language = 'fr'
-# outLanguage = 'ES'
 
 words = []
 
-# Need to have chromedriver installed
-options = webdriver.ChromeOptions()
-options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
-options.add_argument('--headless')
-options.add_argument('--disable-gpu')
+options = webdriver.FirefoxOptions()
+options.headless = True
 
 f = codecs.open("My Clippings.txt", 'r', 'utf-8')
 
@@ -28,7 +23,6 @@ lines = f.read().splitlines()
 
 for i in range(len(lines)):
     if lines[i] == "==========":
-#        word = re.sub(r'[^a-zA-Z]', "", lines[i-1])
         word = lines[i-1]
         words.append(word)
 
@@ -39,12 +33,15 @@ for word in words:
 
     if word != '':
 
+        print(word)
+
         try:
 
             csvfile = open('words.csv', 'a+')
             writer = csv.writer(csvfile, delimiter=";")
 
-            driver = webdriver.Chrome(chrome_options=options)
+            driver = webdriver.Firefox(options=options)
+            driver.set_window_size(1920, 1080)  # Prevents cookies banner from obscuring buttons
             driver.get('https://www.deepl.com/translator')
 
             driver.find_element_by_tag_name('textarea').send_keys(word)
@@ -55,21 +52,10 @@ for word in words:
                 )
             except:
                 print('Page failed to load:')
-#
+
             driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
             inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-' + language + '"]')
             inLangButton.click()
-
-            # driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').click()
-            # #outLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').find_element_by_xpath('//button[@dl-value="' + outLanguage + '"]')
-            # print("trying to click target language")
-            # outLangButton = driver.find_element_by_xpath('//button[@dl-value="ES"]')
-            # outLangButton.click()
-
-            # print('\n\n\nTrying to find translate_from\n\n\n')
-            #
-            # translateFrom = driver.find_element_by_class_name("translate_from")
-            # print(translateFrom.find_element_by_id('strong').text)
 
             try:
                 WebDriverWait(driver, 10).until(
@@ -82,8 +68,6 @@ for word in words:
             soup = BS(pageHTML, 'html.parser')
 
             featured = soup.findAll("div", {"class": "lemma featured"})
-
-            # word = featured[0]
 
             for featuredWord in featured:
 
@@ -131,25 +115,12 @@ for word in words:
                         pass
 
                 else:
-                    # englishWords.append(englishWord)
-                    # foreignWords.append(foreignWord)
                     writer.writerow([englishWord, foreignWord])
                     writer.writerow([foreignWord, englishWord])
 
-
-            # print(englishWords, foreignWords)
 
             driver.close()
 
         except Exception as e:
             print("Exception:", e)
-            print(word)
             continue
-
-# assert(len(englishWords) == len(foreignWords))
-
-# with open("words.csv", "w") as csvfile:
-#     writer = csv.writer(csvfile, delimiter=";")
-#     for i in range(len(englishWords)):
-#         writer.writerow([englishWords[i], foreignWords[i]])
-#         writer.writerow([foreignWords[i], englishWords[i]])
