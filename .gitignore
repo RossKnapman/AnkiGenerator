@@ -2,3 +2,6 @@
 *.html
 *.txt
 *.log
+*.anki2
+*.anki2-shm
+*.anki2-wal
