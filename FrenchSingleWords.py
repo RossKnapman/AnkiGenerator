@@ -53,9 +53,15 @@ for word in words:
             except:
                 print('Page failed to load:')
 
+            # Select the input language
             driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
             inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-' + language + '"]')
             inLangButton.click()
+
+            # Select the output language
+            driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').click()
+            outLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-en-GB"]')
+            outLangButton.click()
 
             try:
                 WebDriverWait(driver, 10).until(
