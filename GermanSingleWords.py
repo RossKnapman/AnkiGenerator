@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+# Note that this is broken!
+# The French version works (as of 08.04.23), but I hope to merge the two into a general file
+# instead of having two almost identical Python scripts.
+
 import codecs
 from bs4 import BeautifulSoup as BS
 from selenium import webdriver

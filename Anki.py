@@ -67,7 +67,6 @@ proxy_index = random_proxy()
 proxy = proxies[proxy_index]
 
 
-
 for i in range(len(words)):
     word = words[i]
 

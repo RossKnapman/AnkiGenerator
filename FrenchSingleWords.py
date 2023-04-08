@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import codecs
 from bs4 import BeautifulSoup as BS
 from selenium import webdriver
@@ -6,7 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
-import time
 import csv
 
 
@@ -15,7 +13,7 @@ language = 'fr'
 words = []
 
 options = webdriver.FirefoxOptions()
-options.headless = True
+options.add_argument('--headless')
 
 f = codecs.open("My Clippings.txt", 'r', 'utf-8')
 
@@ -44,7 +42,7 @@ for word in words:
             driver.set_window_size(1920, 1080)  # Prevents cookies banner from obscuring buttons
             driver.get('https://www.deepl.com/translator')
 
-            driver.find_element_by_tag_name('textarea').send_keys(word)
+            driver.find_element('xpath', '//div[@contenteditable="true"]').send_keys(word)
 
             try:
                 WebDriverWait(driver, 10).until(
@@ -54,13 +52,13 @@ for word in words:
                 print('Page failed to load:')
 
             # Select the input language
-            driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').click()
-            inLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-' + language + '"]')
+            driver.find_element('xpath', '//div[@data-testid="translator-source-lang"]').click()
+            inLangButton = driver.find_element('xpath', '//div[@data-testid="translator-source-lang"]').find_element('xpath', '//button[@data-testid="translator-lang-option-' + language + '"]')
             inLangButton.click()
 
             # Select the output language
-            driver.find_element_by_xpath('//div[@dl-test="translator-target-lang"]').click()
-            outLangButton = driver.find_element_by_xpath('//div[@dl-test="translator-source-lang"]').find_element_by_xpath('//button[@dl-test="translator-lang-option-en-GB"]')
+            driver.find_element('xpath', '//div[@data-testid="translator-target-lang"]').click()
+            outLangButton = driver.find_element('xpath', '//div[@data-testid="translator-source-lang"]').find_element('xpath', '//button[@data-testid="translator-lang-option-en-GB"]')
             outLangButton.click()
 
             try:
